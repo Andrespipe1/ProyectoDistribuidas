@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # Base de datos MySQL
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventario
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+
+  # Primera instancia de la aplicación web (peso 3 - 50% del tráfico)
+  web1:
+    build: .
+    environment:
+      DATABASE_URL: mysql+pymysql://root:root@db:3306/inventario
+    depends_on:
+      - db
+    restart: always
+
+  # Segunda instancia de la aplicación web (peso 2 - 33% del tráfico)
+  web2:
+    build: .
+    environment:
+      DATABASE_URL: mysql+pymysql://root:root@db:3306/inventario
+    depends_on:
+      - db
+    restart: always
+
+  # Tercera instancia de la aplicación web (peso 1 - 17% del tráfico)
+  web3:
+    build: .
+    environment:
+      DATABASE_URL: mysql+pymysql://root:root@db:3306/inventario
+    depends_on:
+      - db
+    restart: always
+
+  # Balanceador de carga NGINX
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - web1
+      - web2
+      - web3
+    restart: always
+
+volumes:
+  db_data: 

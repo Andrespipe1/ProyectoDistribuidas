@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrar Producto</title>
+</head>
+<body>
+    <h2>Registrar Producto</h2>
+    <form method="post">
+        <label>Nombre:</label><input type="text" name="name" required><br>
+        <label>Código:</label><input type="text" name="code" required><br>
+        <label>Descripción:</label><input type="text" name="description"><br>
+        <label>Unidad:</label><input type="text" name="unit"><br>
+        <label>Categoría:</label><input type="text" name="category"><br>
+        <button type="submit">Registrar</button>
+    </form>
+    <a href="/inventory">Volver al inventario</a>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+</body>
+</html> 
