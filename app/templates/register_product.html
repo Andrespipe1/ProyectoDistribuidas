@@ -3,26 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <title>Registrar Producto</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-container { max-width: 500px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 3px; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #218838; }
+        .messages { margin: 20px 0; }
+        .messages ul { list-style: none; padding: 0; }
+        .messages li { padding: 10px; margin: 5px 0; border-radius: 3px; }
+        .messages li:first-child { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .messages li:not(:first-child) { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { text-decoration: none; color: #007bff; }
+    </style>
 </head>
 <body>
-    <h2>Registrar Producto</h2>
-    <form method="post">
-        <label>Nombre:</label><input type="text" name="name" required><br>
-        <label>Código:</label><input type="text" name="code" required><br>
-        <label>Descripción:</label><input type="text" name="description"><br>
-        <label>Unidad:</label><input type="text" name="unit"><br>
-        <label>Categoría:</label><input type="text" name="category"><br>
-        <button type="submit">Registrar</button>
-    </form>
-    <a href="/inventory">Volver al inventario</a>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul>
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
+    <div class="nav-links">
+        <a href="/inventory">← Volver al inventario</a>
+    </div>
+    
+    <div class="form-container">
+        <h2>📝 Registrar Nuevo Producto</h2>
+        
+        <form method="post">
+            <div class="form-group">
+                <label>Nombre del Producto:</label>
+                <input type="text" name="name" required placeholder="Ej: Laptop HP Pavilion">
+            </div>
+            
+            <div class="form-group">
+                <label>Código del Producto:</label>
+                <input type="text" name="code" required placeholder="Ej: LAP001">
+            </div>
+            
+            <div class="form-group">
+                <label>Descripción:</label>
+                <input type="text" name="description" placeholder="Ej: Laptop de 15 pulgadas, 8GB RAM">
+            </div>
+            
+            <div class="form-group">
+                <label>Unidad:</label>
+                <select name="unit">
+                    <option value="">Seleccionar unidad</option>
+                    <option value="Unidad">Unidad</option>
+                    <option value="Kilogramo">Kilogramo</option>
+                    <option value="Litro">Litro</option>
+                    <option value="Metro">Metro</option>
+                    <option value="Caja">Caja</option>
+                    <option value="Paquete">Paquete</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Categoría:</label>
+                <select name="category">
+                    <option value="">Seleccionar categoría</option>
+                    <option value="Electrónicos">Electrónicos</option>
+                    <option value="Ropa">Ropa</option>
+                    <option value="Alimentos">Alimentos</option>
+                    <option value="Hogar">Hogar</option>
+                    <option value="Deportes">Deportes</option>
+                    <option value="Libros">Libros</option>
+                    <option value="Otros">Otros</option>
+                </select>
+            </div>
+            
+            <button type="submit">✅ Registrar Producto</button>
+        </form>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="messages">
+                <ul>
+                {% for message in messages %}
+                  <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+          {% endif %}
+        {% endwith %}
+    </div>
 </body>
 </html> 

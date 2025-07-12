@@ -3,12 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <title>Inventario</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .search-section { background: #f5f5f5; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .search-section input, .search-section select { padding: 5px; margin: 5px; }
+        .search-section button { padding: 8px 15px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .search-section button:hover { background: #0056b3; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .no-results { text-align: center; padding: 20px; color: #666; }
+        .nav-links { margin-bottom: 20px; }
+        .nav-links a { margin-right: 15px; text-decoration: none; color: #007bff; }
+    </style>
 </head>
 <body>
     <h2>Inventario de Productos</h2>
-    <a href="/register_product">Registrar nuevo producto</a> |
-    <a href="/logout">Cerrar sesión</a>
-    <table border="1">
+    
+    <div class="nav-links">
+        <a href="/register_product">Registrar nuevo producto</a> |
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <!-- Sección de búsqueda en tiempo real -->
+    <div class="search-section">
+        <h3>🔍 Consulta en Tiempo Real</h3>
+        <form method="GET" action="/inventory">
+            <input type="text" name="search" placeholder="Buscar por nombre, código o descripción..." 
+                   value="{{ request.args.get('search', '') }}" style="width: 300px;">
+            
+            <select name="category">
+                <option value="">Todas las categorías</option>
+                {% for cat in categories %}
+                <option value="{{ cat }}" {% if request.args.get('category') == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit">Buscar</button>
+            <a href="/inventory" style="margin-left: 10px;">Limpiar filtros</a>
+        </form>
+        
+        <div style="margin-top: 10px;">
+            <strong>Resultados:</strong> {{ products|length }} producto(s) encontrado(s)
+        </div>
+    </div>
+
+    <!-- Tabla de productos -->
+    {% if products %}
+    <table>
         <tr>
             <th>ID</th>
             <th>Nombre</th>
@@ -16,17 +58,25 @@
             <th>Descripción</th>
             <th>Unidad</th>
             <th>Categoría</th>
+            <th>Estado</th>
         </tr>
         {% for product in products %}
         <tr>
             <td>{{ product.id }}</td>
             <td>{{ product.name }}</td>
-            <td>{{ product.code }}</td>
-            <td>{{ product.description }}</td>
-            <td>{{ product.unit }}</td>
-            <td>{{ product.category }}</td>
+            <td><strong>{{ product.code }}</strong></td>
+            <td>{{ product.description or 'Sin descripción' }}</td>
+            <td>{{ product.unit or 'N/A' }}</td>
+            <td>{{ product.category or 'Sin categoría' }}</td>
+            <td>✅ Disponible</td>
         </tr>
         {% endfor %}
     </table>
+    {% else %}
+    <div class="no-results">
+        <h3>No se encontraron productos</h3>
+        <p>Intenta con otros términos de búsqueda o <a href="/register_product">registra un nuevo producto</a></p>
+    </div>
+    {% endif %}
 </body>
 </html> 

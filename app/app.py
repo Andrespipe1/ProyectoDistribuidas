@@ -57,8 +57,35 @@ def register_product():
 def inventory():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    products = Product.query.all()
-    return render_template('inventory.html', products=products)
+    
+    # Obtener parámetros de búsqueda
+    search = request.args.get('search', '')
+    category = request.args.get('category', '')
+    
+    # Construir consulta base
+    query = Product.query
+    
+    # Aplicar filtros
+    if search:
+        query = query.filter(
+            db.or_(
+                Product.name.contains(search),
+                Product.code.contains(search),
+                Product.description.contains(search)
+            )
+        )
+    
+    if category:
+        query = query.filter(Product.category == category)
+    
+    # Obtener productos filtrados
+    products = query.all()
+    
+    # Obtener categorías únicas para el filtro
+    categories = db.session.query(Product.category).distinct().filter(Product.category.isnot(None)).all()
+    categories = [cat[0] for cat in categories]
+    
+    return render_template('inventory.html', products=products, categories=categories)
 
 @app.route('/api/products')
 def api_products():

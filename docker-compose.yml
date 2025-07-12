@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # Base de datos MySQL
+  # Base de datos MySQL (MASTER)
   db:
     image: mysql:8.0
     environment:
@@ -12,6 +12,20 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     restart: always
+
+  # Base de datos MySQL (SLAVE/REPLICA)
+  db-slave:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventario
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_slave_data:/var/lib/mysql
+    restart: always
+    depends_on:
+      - db
 
   # Primera instancia de la aplicación web (peso 3 - 50% del tráfico)
   web1:
@@ -51,5 +65,21 @@ services:
       - web3
     restart: always
 
+  # phpMyAdmin para gestión de la base de datos
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    restart: always
+
 volumes:
-  db_data: 
+  db_data:
+  db_slave_data: 
