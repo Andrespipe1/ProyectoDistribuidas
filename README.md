@@ -177,18 +177,16 @@ upstream backend {
 ## 🖼️ Capturas de pantalla
 
 ### Login moderno
+<img width="600" height="400" alt="imagen" src="https://github.com/user-attachments/assets/d016ec55-a822-454b-a205-8c9283d34519" />
 
-![Login](./screenshots/login.png)
 
 ### Inventario con filtros y acciones
+<img width="600" height="400" alt="imagen" src="https://github.com/user-attachments/assets/ded573dd-be12-4da3-b177-87cf9bdb4a5d" />
 
-![Inventario](./screenshots/inventario.png)
 
 ### Registro de producto
 
-![Registro](./screenshots/registro.png)
-
-> Puedes agregar más capturas en la carpeta `screenshots/` para mostrar tu sistema.
+<img width="600" height="400" alt="imagen" src="https://github.com/user-attachments/assets/cd6ca9fe-ba86-45d6-b3d9-888ec8d999ad" />
 
 ---
 
