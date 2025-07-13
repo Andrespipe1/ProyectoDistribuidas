@@ -97,7 +97,7 @@ ProyectoDistribuidas/
 ### **1. Clonar el repositorio**
 
 ```bash
-git clone https://github.com/tuusuario/ProyectoDistribuidas.git
+git clone https://github.com/Andrespipe1/ProyectoDistribuidas.git
 cd ProyectoDistribuidas
 ```
 
@@ -105,6 +105,13 @@ cd ProyectoDistribuidas
 
 ```bash
 docker-compose up --build -d
+```
+
+- La base de datos y el usuario admin se crean automáticamente.
+- Si cambias dependencias en `requirements.txt`, ejecuta:
+
+```bash
+docker-compose build web1 web2 web3
 ```
 
 ### **3. Acceder a los servicios**
@@ -115,6 +122,14 @@ docker-compose up --build -d
 | **phpMyAdmin**     | http://localhost:8080 | root / root      |
 | **MySQL Master**   | localhost:3306        | root / root      |
 | **MySQL Slave**    | localhost:3307        | root / root      |
+
+### **4. Detener y limpiar el entorno**
+
+```bash
+docker-compose down           # Detener todo
+# Para limpiar volúmenes y datos:
+docker-compose down -v
+```
 
 ---
 
@@ -142,16 +157,38 @@ upstream backend {
 
 - La replicación master-slave está lista para configurarse desde el inicio.
 - Puedes usar el selector de servidores en phpMyAdmin para gestionar tanto el master como el slave.
+- Los archivos `mysql-master.cnf` y `mysql-slave.cnf` ya están configurados para la replicación.
 
 ---
 
 ## 🧪 Pruebas y Funcionalidades
 
-- Registrar, editar y eliminar productos
-- Buscar y filtrar en tiempo real (AJAX)
-- Exportar inventario filtrado a Excel
-- Validar códigos únicos
-- Probar balanceo de carga y replicación
+- **Registrar productos:** Completa el formulario y verifica que no se repitan códigos.
+- **Editar cantidad:** Haz clic en “Editar” en la tabla y cambia la cantidad.
+- **Eliminar productos:** Haz clic en “Eliminar” y confirma.
+- **Buscar y filtrar:** Usa el buscador, el filtro de categoría y el filtro de estado (Disponible/Agotado).
+- **Exportar a Excel:** Haz clic en el botón verde “Exportar a Excel” para descargar el inventario filtrado.
+- **Consulta en tiempo real:** Los resultados se actualizan automáticamente al escribir o filtrar.
+- **Probar balanceo de carga:** Accede a `/health` y refresca varias veces.
+- **Probar replicación:** Agrega productos y verifica en ambos servidores desde phpMyAdmin.
+
+---
+
+## 🖼️ Capturas de pantalla
+
+### Login moderno
+
+![Login](./screenshots/login.png)
+
+### Inventario con filtros y acciones
+
+![Inventario](./screenshots/inventario.png)
+
+### Registro de producto
+
+![Registro](./screenshots/registro.png)
+
+> Puedes agregar más capturas en la carpeta `screenshots/` para mostrar tu sistema.
 
 ---
 
@@ -166,7 +203,15 @@ upstream backend {
 
 ---
 
-## 💡 Notas finales
+## 👤 Autor y Contacto
+
+- **Desarrollador:** Andrés Tufiño
+- **GitHub:** [Andrespipe1](https://github.com/Andrespipe1)
+- **País:** Ecuador
+
+¿Dudas, sugerencias o mejoras? ¡Contáctame por GitHub!
+
+---
 
 - El sistema es totalmente responsivo y moderno.
 - Puedes personalizar las categorías y la lógica fácilmente.
