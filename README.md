@@ -177,12 +177,12 @@ upstream backend {
 ## 🖼️ Capturas de pantalla
 
 ### Login moderno
+
 <img width="600" height="400" alt="imagen" src="https://github.com/user-attachments/assets/d016ec55-a822-454b-a205-8c9283d34519" />
 
-
 ### Inventario con filtros y acciones
-<img width="600" height="400" alt="imagen" src="https://github.com/user-attachments/assets/ded573dd-be12-4da3-b177-87cf9bdb4a5d" />
 
+<img width="600" height="400" alt="imagen" src="https://github.com/user-attachments/assets/ded573dd-be12-4da3-b177-87cf9bdb4a5d" />
 
 ### Registro de producto
 
@@ -214,3 +214,75 @@ upstream backend {
 - El sistema es totalmente responsivo y moderno.
 - Puedes personalizar las categorías y la lógica fácilmente.
 - Si tienes dudas, revisa los comentarios en el código o pregunta.
+
+---
+
+## 🛠️ Configuración Manual de Replicación MySQL (Master-Slave)
+
+Si la replicación no está configurada automáticamente, sigue estos pasos para configurarla usando phpMyAdmin y los nombres de tus servicios:
+
+### 1. Accede a phpMyAdmin en el master (`db`)
+
+- URL: [http://localhost:8080](http://localhost:8080)
+- Selecciona el servidor `db`
+- Usuario: `root`
+- Contraseña: `root`
+
+### 2. Crea el usuario de replicación en el master
+
+En la pestaña "SQL", ejecuta:
+
+```sql
+CREATE USER 'replicador'@'%' IDENTIFIED BY 'replicapass';
+GRANT REPLICATION SLAVE ON *.* TO 'replicador'@'%';
+FLUSH PRIVILEGES;
+```
+
+### 3. Obtén el estado del master
+
+En la pestaña "SQL", ejecuta:
+
+```sql
+SHOW MASTER STATUS;
+```
+
+- Apunta el valor de `File` (ejemplo: `mysql-bin.000001`) y `Position` (ejemplo: `154`).
+
+### 4. Accede a phpMyAdmin en el slave (`db-slave`)
+
+- Cambia el servidor a `db-slave` en phpMyAdmin.
+
+### 5. Configura el slave
+
+En la pestaña "SQL", ejecuta (reemplaza los valores de `MASTER_LOG_FILE` y `MASTER_LOG_POS` por los que obtuviste en el paso anterior):
+
+```sql
+STOP SLAVE;
+
+CHANGE MASTER TO
+  MASTER_HOST='db',
+  MASTER_USER='replicador',
+  MASTER_PASSWORD='replicapass',
+  MASTER_LOG_FILE='mysql-bin.000001',  -- <-- pon aquí el valor de File
+  MASTER_LOG_POS=154;                  -- <-- pon aquí el valor de Position
+
+START SLAVE;
+```
+
+### 6. Verifica el estado de la replicación en el slave
+
+En el slave, ejecuta:
+
+```sql
+SHOW SLAVE STATUS\G
+```
+
+- Busca que `Slave_IO_Running` y `Slave_SQL_Running` digan `Yes`.
+
+---
+
+**Notas:**
+
+- La replicación es unidireccional: lo que insertes en el master (`db`) aparecerá en el slave (`db-slave`).
+- Si editas o insertas datos en el slave, **no** se replicarán al master.
+- Si tienes dudas, revisa los logs de MySQL o consulta la sección de ayuda.
