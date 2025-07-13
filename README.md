@@ -203,11 +203,11 @@ upstream backend {
 
 ## 👤 Autor y Contacto
 
-- **Desarrollador:** Andrés Tufiño
+- **Desarrolladores:** Andrés Tufiño - Darwin Cachimil - Anderson Vilatuña - Wilmer Vargas
 - **GitHub:** [Andrespipe1](https://github.com/Andrespipe1)
 - **País:** Ecuador
 
-¿Dudas, sugerencias o mejoras? ¡Contáctame por GitHub!
+
 
 ---
 
