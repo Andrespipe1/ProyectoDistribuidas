@@ -16,5 +16,5 @@ class Product(db.Model):
     name = db.Column(db.String(100), nullable=False)
     code = db.Column(db.String(50), unique=True, nullable=False)
     description = db.Column(db.String(200))
-    unit = db.Column(db.String(50))
+    unit = db.Column(db.Integer, nullable=False, default=0)  # Ahora es cantidad
     category = db.Column(db.String(50)) 

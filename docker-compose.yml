@@ -11,6 +11,7 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./mysql-master.cnf:/etc/mysql/conf.d/mysql.cnf
     restart: always
 
   # Base de datos MySQL (SLAVE/REPLICA)
@@ -23,6 +24,7 @@ services:
       - "3307:3306"
     volumes:
       - db_slave_data:/var/lib/mysql
+      - ./mysql-slave.cnf:/etc/mysql/conf.d/mysql.cnf
     restart: always
     depends_on:
       - db
@@ -69,8 +71,10 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
     environment:
-      PMA_HOST: db
-      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      PMA_HOSTS: db,db-slave
+      PMA_VERBOSE_1: Master
+      PMA_VERBOSE_2: Slave
       PMA_USER: root
       PMA_PASSWORD: root
       MYSQL_ROOT_PASSWORD: root
@@ -78,6 +82,7 @@ services:
       - "8080:80"
     depends_on:
       - db
+      - db-slave
     restart: always
 
 volumes:
