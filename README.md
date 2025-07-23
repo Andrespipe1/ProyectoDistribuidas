@@ -274,10 +274,11 @@ START SLAVE;
 En el slave, ejecuta:
 
 ```sql
-SHOW SLAVE STATUS\G
+SHOW SLAVE STATUS
 ```
 
 - Busca que `Slave_IO_Running` y `Slave_SQL_Running` digan `Yes`.
+<img width="1024" height="768" alt="imagen" src="https://github.com/user-attachments/assets/87681fcd-457b-464d-8901-aae91baeebb1" />
 
 ---
 
