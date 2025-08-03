@@ -12,6 +12,7 @@ services:
     volumes:
       - db_data:/var/lib/mysql
       - ./mysql-master.cnf:/etc/mysql/conf.d/mysql.cnf
+      - ./mysql-master-init.sql:/docker-entrypoint-initdb.d/01-master-init.sql
     restart: always
 
   # Base de datos MySQL (SLAVE/REPLICA)
@@ -25,6 +26,7 @@ services:
     volumes:
       - db_slave_data:/var/lib/mysql
       - ./mysql-slave.cnf:/etc/mysql/conf.d/mysql.cnf
+      - ./mysql-slave-init.sql:/docker-entrypoint-initdb.d/01-slave-init.sql
     restart: always
     depends_on:
       - db
@@ -66,6 +68,22 @@ services:
       - web2
       - web3
     restart: always
+
+  # Servicio para configurar automáticamente la replicación
+  replication-setup:
+    image: mysql:8.0
+    command: >
+      sh -c "
+        apk add --no-cache bash &&
+        chmod +x /setup-replication.sh &&
+        /setup-replication.sh
+      "
+    volumes:
+      - ./setup-replication.sh:/setup-replication.sh
+    depends_on:
+      - db
+      - db-slave
+    restart: "no"
 
   # phpMyAdmin para gestión de la base de datos
   phpmyadmin:

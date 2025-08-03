@@ -108,6 +108,7 @@ docker-compose up --build -d
 ```
 
 - La base de datos y el usuario admin se crean automáticamente.
+- **La replicación MySQL Master-Slave se configura automáticamente.**
 - Si cambias dependencias en `requirements.txt`, ejecuta:
 
 ```bash
@@ -155,9 +156,10 @@ upstream backend {
 
 ## 🔄 Replicación MySQL
 
-- La replicación master-slave está lista para configurarse desde el inicio.
+- **La replicación master-slave se configura automáticamente al levantar los servicios.**
+- El servicio `replication-setup` se encarga de configurar la replicación entre Master y Slave.
 - Puedes usar el selector de servidores en phpMyAdmin para gestionar tanto el master como el slave.
-- Los archivos `mysql-master.cnf` y `mysql-slave.cnf` ya están configurados para la replicación.
+- Los archivos `mysql-master.cnf` y `mysql-slave.cnf` están configurados para la replicación.
 
 ---
 
@@ -207,8 +209,6 @@ upstream backend {
 - **GitHub:** [Andrespipe1](https://github.com/Andrespipe1)
 - **País:** Ecuador
 
-
-
 ---
 
 - El sistema es totalmente responsivo y moderno.
@@ -217,68 +217,35 @@ upstream backend {
 
 ---
 
-## 🛠️ Configuración Manual de Replicación MySQL (Master-Slave)
+## 🛠️ Verificación de la Replicación Automática
 
-Si la replicación no está configurada automáticamente, sigue estos pasos para configurarla usando phpMyAdmin y los nombres de tus servicios:
+Para verificar que la replicación se configuró correctamente:
 
-### 1. Accede a phpMyAdmin en el master (`db`)
+### 1. Revisar logs del servicio de configuración
 
-- URL: [http://localhost:8080](http://localhost:8080)
-- Selecciona el servidor `db`
-- Usuario: `root`
-- Contraseña: `root`
-
-### 2. Crea el usuario de replicación en el master
-
-En la pestaña "SQL", ejecuta:
-
-```sql
-CREATE USER 'replicador'@'%' IDENTIFIED BY 'replicapass';
-GRANT REPLICATION SLAVE ON *.* TO 'replicador'@'%';
-FLUSH PRIVILEGES;
+```bash
+docker-compose logs replication-setup
 ```
 
-### 3. Obtén el estado del master
+Deberías ver mensajes como:
 
-En la pestaña "SQL", ejecuta:
+- ✅ MySQL Master está listo
+- ✅ MySQL Slave está listo
+- ✅ Replicación configurada exitosamente!
 
-```sql
-SHOW MASTER STATUS;
-```
+### 2. Verificar desde phpMyAdmin
 
-- Apunta el valor de `File` (ejemplo: `mysql-bin.000001`) y `Position` (ejemplo: `154`).
+- Accede a http://localhost:8080
+- Selecciona el servidor `db-slave`
+- Ejecuta: `SHOW SLAVE STATUS\G`
+- Verifica que `Slave_IO_Running` y `Slave_SQL_Running` sean `Yes`
 
-### 4. Accede a phpMyAdmin en el slave (`db-slave`)
+### 3. Probar la replicación
 
-- Cambia el servidor a `db-slave` en phpMyAdmin.
-
-### 5. Configura el slave
-
-En la pestaña "SQL", ejecuta (reemplaza los valores de `MASTER_LOG_FILE` y `MASTER_LOG_POS` por los que obtuviste en el paso anterior):
-
-```sql
-STOP SLAVE;
-
-CHANGE MASTER TO
-  MASTER_HOST='db',
-  MASTER_USER='replicador',
-  MASTER_PASSWORD='replicapass',
-  MASTER_LOG_FILE='mysql-bin.000001',  -- <-- pon aquí el valor de File
-  MASTER_LOG_POS=154;                  -- <-- pon aquí el valor de Position
-
-START SLAVE;
-```
-
-### 6. Verifica el estado de la replicación en el slave
-
-En el slave, ejecuta:
-
-```sql
-SHOW SLAVE STATUS
-```
-
-- Busca que `Slave_IO_Running` y `Slave_SQL_Running` digan `Yes`.
-<img width="1024" height="768" alt="imagen" src="https://github.com/user-attachments/assets/87681fcd-457b-464d-8901-aae91baeebb1" />
+1. **En el Master:** Agrega un producto desde la aplicación web
+2. **En el Slave:** Verifica que aparezca en phpMyAdmin
+3. **En el Master:** Modifica un producto
+4. **En el Slave:** Verifica que se actualice
 
 ---
 
@@ -286,4 +253,4 @@ SHOW SLAVE STATUS
 
 - La replicación es unidireccional: lo que insertes en el master (`db`) aparecerá en el slave (`db-slave`).
 - Si editas o insertas datos en el slave, **no** se replicarán al master.
-- Si tienes dudas, revisa los logs de MySQL o consulta la sección de ayuda.
+- Si la replicación falla, puedes reiniciar el servicio: `docker-compose restart replication-setup`
