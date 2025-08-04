@@ -2,7 +2,7 @@
 
 ## Descripción
 
-Aplicación web de gestión de inventario desarrollada en **Flask (Python)** con arquitectura distribuida y moderna. Permite gestionar productos con autenticación, edición, eliminación, consulta en tiempo real, exportación a Excel, balanceo de carga NGINX y replicación MySQL master-slave.
+Aplicación web de gestión de inventario desarrollada en **Flask (Python)** con arquitectura distribuida completamente automatizada. Sistema moderno con autenticación, gestión de productos, consulta en tiempo real, exportación a Excel, balanceo de carga NGINX y replicación MySQL master-slave **100% funcional**.
 
 ---
 
@@ -14,14 +14,16 @@ Aplicación web de gestión de inventario desarrollada en **Flask (Python)** con
 │   Puerto: 80    │    │   Puerto: 8080  │    │   Puerto: 3306  │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                       │                       │
-         │                       │                       │
-    ┌────┴────┐                 │                 ┌────┴────┐
-    │         │                 │                 │         │
-┌───▼───┐ ┌───▼───┐             │             ┌───▼───┐ ┌───▼───┐
-│ Web1  │ │ Web2  │             │             │ Web3  │ │Slave DB│
-│(50%)  │ │(33%)  │             │             │(17%)  │ │(3307) │
-└───────┘ └───────┘             │             └───────┘ └───────┘
+         │                       │                 ┌────┴────┐
+    ┌────┴────┐                 │                 │         │
+    │         │                 │                 │   MySQL │
+┌───▼───┐ ┌───▼───┐             │             ┌───▼───┐ │ Slave  │
+│ Web1  │ │ Web2  │             │             │ Web3  │ │ 3307  │
+│(50%)  │ │(33%)  │             │             │(17%)  │ └───────┘
+└───────┘ └───────┘             │             └───────┘
 ```
+
+**🎯 REPLICACIÓN AUTOMÁTICA:** Los datos se sincronizan en tiempo real entre Master y Slave
 
 ---
 
@@ -35,11 +37,13 @@ Aplicación web de gestión de inventario desarrollada en **Flask (Python)** con
 - **Filtro por estado** (Disponible/Agotado) y por categoría
 - **Edición rápida de cantidad**
 - **Exportar inventario filtrado a Excel**
-- **Balanceo de carga NGINX**
-- **Replicación MySQL master-slave**
-- **phpMyAdmin con selector de Master/Slave**
+- **⚖️ Balanceo de carga NGINX** automático
+- **🔄 Replicación MySQL master-slave** 100% funcional
+- **📊 phpMyAdmin con selector Master/Slave**
+- **🚀 Configuración completamente automatizada**
 
 ---
+
 
 ## 🐳 Infraestructura Docker
 
