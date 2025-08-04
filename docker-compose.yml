@@ -11,7 +11,11 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./mysql-master.cnf:/etc/mysql/conf.d/mysql.cnf
+    command: >
+      --server-id=1
+      --log-bin=mysql-bin
+      --binlog-format=ROW
+      --binlog-do-db=inventario
     restart: always
 
   # Base de datos MySQL (SLAVE/REPLICA)
@@ -24,7 +28,12 @@ services:
       - "3307:3306"
     volumes:
       - db_slave_data:/var/lib/mysql
-      - ./mysql-slave.cnf:/etc/mysql/conf.d/mysql.cnf
+    command: >
+      --server-id=2
+      --relay-log=mysql-relay-bin
+      --log-slave-updates=1
+      --read-only=1
+      --replicate-do-db=inventario
     restart: always
     depends_on:
       - db

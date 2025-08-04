@@ -16,8 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Exponer el puerto de Flask
 EXPOSE 5000
 
-# Hacer el script ejecutable
-RUN chmod +x start.sh
+# Convertir finales de línea y hacer el script ejecutable
+RUN sed -i 's/\r$//' start.sh && chmod +x start.sh
 
 # Comando para ejecutar la aplicación
 CMD ["./start.sh"] 
