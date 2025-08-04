@@ -60,7 +60,199 @@ Aplicación web de gestión de inventario desarrollada en **Flask (Python)** con
 ## 📁 Estructura del Proyecto
 
 ```
+# 🏢 Sistema Distribuido de Inventario
+
+Sistema web distribuido de gestión de inventario con Flask, MySQL master-slave replication, NGINX load balancer y alta disponibilidad.
+
+## 🚀 Características
+
+- **🔄 Replicación MySQL Master-Slave**: Datos replicados automáticamente
+- **⚖️ Load Balancer NGINX**: Distribución inteligente de tráfico
+- **🏗️ Arquitectura Distribuida**: 3 instancias Flask para alta disponibilidad
+- **📊 Monitoreo con phpMyAdmin**: Acceso a ambas bases de datos
+- **🐳 Containerización Docker**: Fácil despliegue y escalabilidad
+- **⚡ Configuración Automática**: Scripts de inicialización incluidos
+
+## 📋 Arquitectura del Sistema
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   NGINX         │    │   Flask Apps     │    │   MySQL         │
+│   Load Balancer │────│   (3 instancias) │────│   Master-Slave  │
+│   Port 80       │    │   web1,web2,web3 │    │   3306 / 3307   │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                                │
+                       ┌──────────────────┐
+                       │   phpMyAdmin     │
+                       │   Port 8080      │
+                       └──────────────────┘
+```
+
+## 🎯 Inicio Rápido
+
+### Opción 1: Configuración Automática (Recomendado)
+
+**Para Windows:**
+```powershell
+# Abrir PowerShell como Administrador
+cd "C:\ruta\al\ProyectoDistribuidas"
+.etup-mysql-replication.ps1
+```
+
+**Para Linux/macOS:**
+```bash
+cd /ruta/al/ProyectoDistribuidas
+chmod +x setup-mysql-replication.sh
+./setup-mysql-replication.sh
+```
+
+### Opción 2: Configuración Manual
+
+```bash
+# 1. Clonar el repositorio
+git clone [URL-del-repositorio]
+cd ProyectoDistribuidas
+
+# 2. Construir y levantar servicios
+docker-compose up -d
+
+# 3. Verificar estado
+docker-compose ps
+
+# 4. Configurar replicación (ver MANUAL_REPLICACION.md)
+```
+
+## 📚 Documentación
+
+- **[📖 Manual Completo de Replicación](MANUAL_REPLICACION.md)**: Guía detallada paso a paso
+- **[🔧 Solución de Problemas](MANUAL_REPLICACION.md#-solución-de-problemas)**: Errores comunes y soluciones
+
+## 🌐 Acceso a Servicios
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| **Aplicación Web** | http://localhost | Sistema de inventario principal |
+| **phpMyAdmin** | http://localhost:8080 | Interfaz de administración de BD |
+| **MySQL Master** | localhost:3306 | Base de datos principal |
+| **MySQL Slave** | localhost:3307 | Base de datos de respaldo |
+
+### Credenciales por Defecto
+- **MySQL Root**: Usuario: `root`, Contraseña: `root`
+- **Replicación**: Usuario: `replicator`, Contraseña: `replicator_password`
+
+## 🏗️ Estructura del Proyecto
+
+```
 ProyectoDistribuidas/
+├── 📄 docker-compose.yml          # Configuración principal
+├── 📄 Dockerfile                  # Imagen de la aplicación Flask
+├── 📁 mysql-init/                 # Scripts de inicialización automática
+│   ├── 01-master-init.sql         # Configuración del master
+│   └── setup-replication.sh       # Script de replicación
+├── 📁 app/                        # Aplicación Flask
+│   ├── app.py                     # Aplicación principal
+│   ├── models.py                  # Modelos de datos
+│   ├── init_db.py                 # Inicializador de BD
+│   └── templates/                 # Plantillas HTML
+├── 📁 nginx/                      # Configuración NGINX
+│   ├── Dockerfile                 # Imagen personalizada
+│   └── nginx.conf                 # Configuración del balanceador
+├── 📄 setup-mysql-replication.sh  # Script automático (Linux/macOS)
+├── 📄 setup-mysql-replication.ps1 # Script automático (Windows)
+└── 📄 MANUAL_REPLICACION.md       # Manual detallado
+```
+
+## ⚙️ Configuración Avanzada
+
+### Variables de Entorno
+```yaml
+# Aplicación Flask
+DATABASE_URL: mysql+pymysql://root:root@db:3306/inventario
+
+# phpMyAdmin
+PMA_HOSTS: db,db-slave
+PMA_USER: root
+PMA_PASSWORD: root
+```
+
+### Configuración MySQL
+```yaml
+# Master (server-id=1)
+--log-bin=mysql-bin
+--binlog-format=ROW
+
+# Slave (server-id=2)
+--relay-log=mysql-relay-bin
+--read-only=1
+```
+
+## 🔍 Monitoreo y Verificación
+
+### Verificar Estado de Replicación
+```bash
+# Estado del slave
+docker exec proyectodistribuidas-db-slave-1 mysql -u root -proot -e "SHOW SLAVE STATUS\G" | grep -E "(Slave_IO_Running|Slave_SQL_Running|Last_Error)"
+
+# Estado del master
+docker exec proyectodistribuidas-db-1 mysql -u root -proot -e "SHOW MASTER STATUS;"
+```
+
+### Probar Replicación
+```bash
+# Insertar en master
+docker exec proyectodistribuidas-db-1 mysql -u root -proot -e "
+USE inventario; 
+INSERT INTO product (name, code, description, unit, category) 
+VALUES ('Test', 'T001', 'Producto de prueba', 1, 'Test');"
+
+# Verificar en slave
+docker exec proyectodistribuidas-db-slave-1 mysql -u root -proot -e "
+USE inventario; 
+SELECT * FROM product WHERE code='T001';"
+```
+
+## 🚨 Solución de Problemas
+
+### Problemas Comunes
+
+1. **Server IDs iguales**: Verificar configuración en docker-compose.yml
+2. **Puertos ocupados**: Cambiar puertos en configuración
+3. **Replicación fallida**: Consultar [Manual de Replicación](MANUAL_REPLICACION.md)
+
+### Logs y Debugging
+```bash
+# Ver logs de contenedores
+docker-compose logs db
+docker-compose logs db-slave
+docker-compose logs web1
+
+# Estado de contenedores
+docker-compose ps
+
+# Reinicio limpio
+docker-compose down && docker-compose up -d
+```
+
+## 🤝 Contribución
+
+1. Fork el proyecto
+2. Crear rama de feature (`git checkout -b feature/AmazingFeature`)
+3. Commit cambios (`git commit -m 'Add AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abrir Pull Request
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+
+## 🎉 ¡Listo para Producción!
+
+Con esta configuración tienes un sistema completamente funcional con:
+- ✅ Alta disponibilidad
+- ✅ Replicación automática
+- ✅ Load balancing
+- ✅ Monitoreo incluido
+- ✅ Fácil escalabilidad
 │
 ├── app/                          # Aplicación Flask
 │   ├── app.py                   # Rutas y lógica principal

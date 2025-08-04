@@ -8,4 +8,7 @@ app.secret_key = 'supersecretkey'
 # Configuración de la base de datos
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'mysql+pymysql://root:root@db:3306/inventario')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app) 
+db = SQLAlchemy(app)
+
+# Importar las rutas después de crear la app y db para evitar importaciones circulares
+from app import * 

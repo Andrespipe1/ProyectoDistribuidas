@@ -17,4 +17,11 @@ class Product(db.Model):
     code = db.Column(db.String(50), unique=True, nullable=False)
     description = db.Column(db.String(200))
     unit = db.Column(db.Integer, nullable=False, default=0)  # Ahora es cantidad
-    category = db.Column(db.String(50)) 
+    category = db.Column(db.String(50))
+    
+    def __init__(self, name, code, description=None, unit=0, category=None):
+        self.name = name
+        self.code = code
+        self.description = description
+        self.unit = unit
+        self.category = category 

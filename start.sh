@@ -1,14 +1,15 @@
 #!/bin/bash
 
-# Inicializar la base de datos
-echo "🔧 Inicializando base de datos..."
-python init_db.py
+# Script de inicio para la aplicación Flask
+echo "Iniciando aplicación Flask..."
 
-# Si la inicialización fue exitosa, ejecutar la aplicación
-if [ $? -eq 0 ]; then
-    echo "🚀 Iniciando aplicación Flask..."
-    python app.py
-else
-    echo "❌ Error al inicializar la base de datos"
-    exit 1
-fi 
+# Esperar a que MySQL esté disponible
+echo "Esperando a MySQL..."
+while ! mysqladmin ping -h"$DB_HOST" -u"$DB_USER" -p"$DB_PASSWORD" --silent; do
+    sleep 1
+done
+
+echo "MySQL está listo. Inicializando base de datos..."
+
+# Ejecutar la aplicación
+python run.py
