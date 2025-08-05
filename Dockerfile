@@ -19,5 +19,5 @@ EXPOSE 5000
 # Convertir finales de línea y hacer el script ejecutable
 RUN sed -i 's/\r$//' start.sh && chmod +x start.sh
 
-# Comando para ejecutar la aplicación
-CMD ["./start.sh"] 
+# Comando para ejecutar la aplicación usando el script de Python
+CMD ["python", "run.py"] 

@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   # Base de datos MySQL (MASTER)
   db:
-    image: mysql:8.0
+    image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: inventario
@@ -11,16 +9,22 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+      - ./mysql-init/01-master-init.sql:/docker-entrypoint-initdb.d/01-master-init.sql
     command: >
       --server-id=1
       --log-bin=mysql-bin
       --binlog-format=ROW
-      --binlog-do-db=inventario
+      --skip-host-cache
+      --skip-name-resolve
+      --max-connections=50
+      --innodb-buffer-pool-size=64M
+      --innodb-log-file-size=16M
+      --innodb-flush-log-at-trx-commit=2
     restart: always
 
   # Base de datos MySQL (SLAVE/REPLICA)
   db-slave:
-    image: mysql:8.0
+    image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: inventario
@@ -28,12 +32,26 @@ services:
       - "3307:3306"
     volumes:
       - db_slave_data:/var/lib/mysql
+      - ./mysql-init/02-slave-init.sql:/docker-entrypoint-initdb.d/02-slave-init.sql
     command: >
       --server-id=2
       --relay-log=mysql-relay-bin
       --log-slave-updates=1
       --read-only=1
-      --replicate-do-db=inventario
+      --skip-host-cache
+      --skip-name-resolve
+      --max-connections=50
+      --innodb-buffer-pool-size=64M
+      --innodb-log-file-size=16M
+      --innodb-flush-log-at-trx-commit=2
+      --skip-innodb-doublewrite
+      --skip-host-cache
+      --skip-name-resolve
+      --max-connections=50
+      --table-open-cache=1000
+      --innodb-fast-shutdown=2
+      --default-authentication-plugin=mysql_native_password
+      --innodb-use-native-aio=0
     restart: always
     depends_on:
       - db

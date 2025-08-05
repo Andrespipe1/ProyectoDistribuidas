@@ -5,7 +5,7 @@ from models import User, Product
 
 def wait_for_db():
     """Espera a que la base de datos esté disponible"""
-    max_attempts = 30
+    max_attempts = 120  # Aumentado para desarrollo (6 minutos)
     attempt = 0
     
     while attempt < max_attempts:
@@ -16,14 +16,15 @@ def wait_for_db():
                 user='root',
                 password='root',
                 database='inventario',
-                port=3306
+                port=3306,
+                connect_timeout=10  # Timeout más largo
             )
             connection.close()
             print("✅ Base de datos MySQL está lista!")
             return True
         except Exception as e:
             print(f"⏳ Esperando a MySQL... (intento {attempt + 1}/{max_attempts})")
-            time.sleep(2)
+            time.sleep(3)  # Pausa de 3 segundos
             attempt += 1
     
     print("❌ No se pudo conectar a MySQL después de varios intentos")
